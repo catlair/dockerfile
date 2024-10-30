@@ -1,0 +1,34 @@
+FROM alpine:3.20.3
+
+RUN set -x \
+    && apk update -f \
+    && apk add --no-cache \
+      libstdc++ \
+      bash \
+      curl \
+      unzip \
+      coreutils \
+      git \
+      vim \
+      python3 \
+      wget \
+      starship \
+    && echo 'export PATH=$HOME/bin/:$PATH' >> $HOME/.bashrc \
+    && echo 'export FNM_NODE_DIST_MIRROR=https://unofficial-builds.nodejs.org/download/release' >> $HOME/.bashrc \
+    && echo 'export FNM_ARCH=x64-musl' >> $HOME/.bashrc \
+    && echo 'eval "$(fnm env --use-on-cd --shell bash)"' >> $HOME/.bashrc \
+    && bash \
+    && cd ~ && mkdir bin/ \
+    && cd bin/ \
+    && wget https://github.com/Schniz/fnm/releases/download/v1.37.2/fnm-linux.zip \
+    && unzip fnm-linux.zip \
+    && chmod +x fnm \
+    && cd - \
+    && source $HOME/.bashrc \
+    && fnm use --install-if-missing 22 \
+    && npm install -g pnpm tsx \
+    && rm -rf /var/cache/apk/* \
+    && npm cache clean --force \
+    && echo 'eval "$(starship init bash)"' >> $HOME/.bashrc
+
+ENTRYPOINT ["/bin/bash"]
